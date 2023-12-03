@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MissionSpan.Console;
 public class LogParser
 {
+    static readonly Regex Regex = new(@"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) (\w+) (/.+) (\d+) (\d+)ms", RegexOptions.Compiled);
+
     public static List<LogModel> ProcessLogs_Span(string[] logLines)
     {
         foreach (var line in logLines)
@@ -75,6 +73,29 @@ public class LogParser
         foreach (var line in logLines)
         {
             Match match = Regex.Match(line, pattern);
+
+            if (match.Success)
+            {
+                var httpMethod = match.Groups[3].Value;
+
+                if (httpMethod != "GET")
+                    continue;
+
+                var date = DateTime.ParseExact(match.Groups[1].Value + match.Groups[2].Value, "yyyy-MM-ddHH:mm:ss", CultureInfo.InvariantCulture);
+                int duration = int.Parse(match.Groups[6].Value);
+
+                _ = new LogModel(duration, httpMethod, date);
+            }
+        }
+
+        return null;
+    }
+
+    public static List<LogModel> ProcessLogs_CompiledRegex(string[] logLines)
+    {
+        foreach (var line in logLines)
+        {
+            Match match = LogParser.Regex.Match(line);
 
             if (match.Success)
             {

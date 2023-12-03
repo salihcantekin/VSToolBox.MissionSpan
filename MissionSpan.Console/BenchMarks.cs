@@ -1,11 +1,14 @@
-﻿using MissionSpan.Console;
+﻿using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Jobs;
+using MissionSpan.Console;
 
 namespace ConsoleApp;
 
 [MemoryDiagnoser]
-[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net60)]
-[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net70)]
-[SimpleJob(BenchmarkDotNet.Jobs.RuntimeMoniker.Net80)]
+[MeanColumn]
+[SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net60)]
+[SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net70)]
+[SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net80)]
 public class BenchMarks
 {
     private readonly string[] logLines;
@@ -37,6 +40,12 @@ public class BenchMarks
     [Benchmark]
     public List<LogModel> ProcessLogs_Regex()
     {
-        return LogParser.ProcessLogs_Split(logLines);
+        return LogParser.ProcessLogs_Regex(logLines);
+    }
+
+    [Benchmark]
+    public List<LogModel> ProcessLogs_CompiledRegex()
+    {
+        return LogParser.ProcessLogs_CompiledRegex(logLines);
     }
 }
