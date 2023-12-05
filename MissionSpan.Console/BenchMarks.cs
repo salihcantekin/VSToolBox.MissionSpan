@@ -1,14 +1,11 @@
-﻿using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Jobs;
 using MissionSpan.Console;
 
 namespace ConsoleApp;
 
 [MemoryDiagnoser]
-[MeanColumn]
-[SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net60)]
-[SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net70)]
-[SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net80)]
+[SimpleJob(RuntimeMoniker.Net80)]
+
 public class BenchMarks
 {
     private readonly string[] logLines;

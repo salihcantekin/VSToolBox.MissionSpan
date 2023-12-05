@@ -1,10 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace MissionSpan.Console;
+﻿namespace MissionSpan.Console;
 public class LogParser
 {
-    static readonly Regex Regex = new(@"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) (\w+) (/.+) (\d+) (\d+)ms", RegexOptions.Compiled);
-
     public static List<LogModel> ProcessLogs_Span(string[] logLines)
     {
         foreach (var line in logLines)
@@ -15,7 +11,10 @@ public class LogParser
             if (!httpMethod.SequenceEqual("GET"))
                 continue;
 
-            var createdDate = DateTime.ParseExact(lineSpan[..19], "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            ReadOnlySpan<char> dateTimeSpan = lineSpan[..19];
+            var createdDate = DateTime.ParseExact(dateTimeSpan,
+                                                  "yyyy-MM-dd HH:mm:ss",
+                                                  CultureInfo.InvariantCulture);
 
             var durationIndex = lineSpan.LastIndexOf(' ');
             var durationStr = lineSpan.Slice(durationIndex + 1, line.Length - durationIndex - 3);
@@ -113,4 +112,6 @@ public class LogParser
 
         return null;
     }
+
+    static readonly Regex Regex = new(@"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) (\w+) (/.+) (\d+) (\d+)ms", RegexOptions.Compiled);
 }
